@@ -20,7 +20,10 @@ int main(){
     connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 
     //sending data
-    const char* message = "Hello, server!";
+    string s = "";
+    cout << "Enter a message: ";
+    getline(cin, s); 
+    const char* message = s.c_str();
     send(clientSocket, message, strlen(message), 0);
 
     //closing socket

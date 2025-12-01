@@ -21,17 +21,24 @@ int main(){
     bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
     //  use this socket - import serverAddress & type cast - identify addr
 
-    //listen to the assign socket
-    listen(serverSocket, 5);
+    int count = 5;
+    while(count>0){
+        //listen to the assign socket
+        cout << "Listening to request: ..." << endl;
+        listen(serverSocket, 5);
 
-    //accepting connection request
-    int clientSocket = accept(serverSocket, nullptr, nullptr);
-    //create a socket for answering, careless about client's IP and port
+        //accepting connection request
+        int clientSocket = accept(serverSocket, nullptr, nullptr);
+        //create a socket for answering, careless about client's IP and port
 
-    //receiving data
-    char buffer[1024] = {0};
-    recv(clientSocket, buffer, sizeof(buffer), 0);
-    cout << "Message from client: " << buffer << endl;
+        //receiving data
+        char buffer[1024] = {0};
+        recv(clientSocket, buffer, sizeof(buffer), 0);
+        cout << "A ha! Found a client's message. It said: \"" << buffer << "\"" << endl;
+
+        count--;
+    }
+    cout << "That is enough for today! See you later!" << endl;
 
     //closeing socket
     close(serverSocket);
