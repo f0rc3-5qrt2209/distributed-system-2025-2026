@@ -22,21 +22,47 @@ int main(){
     //  use this socket - import serverAddress & type cast - identify addr
 
     int count = 5;
-    while(count>0){
-        //listen to the assign socket
+    int fileIndex = 1;
+
+    while(count > 0){
+        //listen
         cout << "Listening to request: ..." << endl;
         listen(serverSocket, 5);
 
         //accepting connection request
         int clientSocket = accept(serverSocket, nullptr, nullptr);
-        //create a socket for answering, careless about client's IP and port
 
-        //receiving data
-        char buffer[1024] = {0};
-        recv(clientSocket, buffer, sizeof(buffer), 0);
-        cout << "A ha! Found a client's message. It said: \"" << buffer << "\"" << endl;
+        // === RECEIVING FILE HERE ===
+        cout << "Client connected!" << endl;
 
+        char header;
+        recv(clientSocket, &header, 1, 0);
+        
+        if(header == 'M'){
+            char buffer[1024] = {0};
+            recv(clientSocket, buffer, sizeof(buffer), 0);
+            cout << "Client message: \"" << buffer << "\"" << endl;
+        } else if(header == 'F'){
+            const int BUFFER_SIZE = 4096;
+            char buffer[BUFFER_SIZE];
+
+            // file name changes each loop
+            string fileName = "received_" + to_string(fileIndex) + ".bin";
+            FILE* fd = fopen(fileName.c_str(), "wb");
+
+            int bytes_read;
+
+            while ((bytes_read = recv(clientSocket, buffer, BUFFER_SIZE, 0)) > 0){
+                fwrite(buffer, 1, bytes_read, fd);
+            }
+            fclose(fd);
+
+            cout << "Saved file as: " << fileName << endl;
+            fileIndex++;
+        }
+        close(clientSocket);            
         count--;
+        cout << "-----------------" << endl;
     }
     cout << "That is enough for today! See you later!" << endl;
 
